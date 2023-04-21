@@ -67,17 +67,33 @@ router.get('/male', authenticateToken, async (req, res) => {
   }
 });
 
-// Authenticate JWT token
+// // Get one male user with authentication
+// router.get('/m', authenticateToken, async (req, res) => {
+//   try {
+//     const user = await User.findOne({ gender: 'Male' });
+//     if (!user) {
+//       return res.status(404).json({ message: 'No male users found' });
+//     }
+//     const users = await User.find({ gender: 'Male' });
+//     res.json(users);
+//   } catch (err) {
+//     res.status(500).json({ message: err.message });
+//   }
+// });
+
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) return res.sendStatus(401);
+  if (token == null) return res.status(401).json({ message: 'Missing token' });
 
   jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
+    if (err) {
+      return res.status(403).json({ message: 'Invalid token' });
+    }
     req.user = user;
     next();
   });
 }
+
 
 module.exports = router;
